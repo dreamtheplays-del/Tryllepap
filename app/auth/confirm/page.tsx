@@ -32,11 +32,12 @@ function ConfirmHandler() {
       const user = data.user
       setStatus('CHECKING YOUR PROFILE...')
 
+      // maybeSingle() returns null instead of 406 when no row found
       const { data: existing } = await supabase
         .from('profiles')
         .select('id, username')
         .eq('id', user.id)
-        .single()
+        .maybeSingle()
 
       if (!existing) {
         setStatus('CREATING YOUR PROFILE...')
