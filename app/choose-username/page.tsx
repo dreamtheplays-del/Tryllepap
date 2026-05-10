@@ -11,7 +11,6 @@ export default function ChooseUsernamePage() {
   const [checking, setChecking] = useState(true)
 
   useEffect(() => {
-    // If user already has a username, redirect home
     const check = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
@@ -38,7 +37,6 @@ export default function ChooseUsernamePage() {
     setLoading(true)
     setError('')
 
-    // Check if username is taken
     const { data: taken } = await supabase
       .from('profiles')
       .select('id')
@@ -66,6 +64,7 @@ export default function ChooseUsernamePage() {
     }
 
     router.push('/')
+    router.refresh()
   }
 
   if (checking) return null
@@ -114,7 +113,7 @@ export default function ChooseUsernamePage() {
             onChange={e => setUsername(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSubmit()}
             maxLength={20}
-            style={{ marginBottom: '1rem' }}
+            style={{ marginBottom: '0.75rem', width: '100%' }}
           />
 
           <p style={{
