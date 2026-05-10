@@ -1,30 +1,44 @@
 'use client'
 import { Suspense, useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { createBrowserClient } from '@supabase/ssr'
 
 function ConfirmHandler() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [status, setStatus] = useState('OPENING THE GATE...')
 
   useEffect(() => {
     const run = async () => {
+      const code = searchParams.get('code')
+
+      if (!code) {
+        setStatus('No login code found.')
+        setTimeout(() => router.push('/login'), 2000)
+        return
+      }
+
       setStatus('VERIFYING YOUR IDENTITY...')
 
-      // Session is already exchanged server-side in /auth/callback/route.ts
-      // We just need to read the current user from the session cookie
-      const { data: { user }, error } = await supabase.auth.getUser()
+      // Create a fresh browser client — it has access to the PKCE verifier
+      // stored in localStorage during the OAuth initiation on this same browser
+      const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      )
 
-      if (error || !user) {
-        console.error('No active session:', error)
+      const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+
+      if (error || !data.user) {
+        console.error('Session exchange failed:', error)
         setStatus('Login failed. Returning...')
         setTimeout(() => router.push('/login'), 2000)
         return
       }
 
+      const user = data.user
       setStatus('CHECKING YOUR PROFILE...')
 
-      // maybeSingle() returns null instead of 406 when no row found
       const { data: existing } = await supabase
         .from('profiles')
         .select('id, username')
@@ -55,7 +69,7 @@ function ConfirmHandler() {
     }
 
     run()
-  }, [router])
+  }, [router, searchParams])
 
   return (
     <div style={{
