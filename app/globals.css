@@ -1,0 +1,209 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-deep: #0a0a0f;
+  --bg-mid: #12121a;
+  --bg-panel: #1a1a24;
+  --crimson: #8b0000;
+  --crimson-bright: #c41e1e;
+  --parchment: #c9a96e;
+  --parchment-light: #e8d5a3;
+  --silver: #a8b8c8;
+  --silver-dim: #6a7a8a;
+  --gold: #d4a935;
+  --ember: #ff6b1a;
+  --font-display: 'Cinzel Decorative', serif;
+  --font-body: 'EB Garamond', serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background: var(--bg-deep);
+  color: var(--parchment-light);
+  font-family: var(--font-body);
+  font-size: 18px;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  color: var(--parchment);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-deep); }
+::-webkit-scrollbar-thumb { background: var(--crimson); border-radius: 3px; }
+
+/* Runic glow utility */
+.glow-crimson { box-shadow: 0 0 20px rgba(139,0,0,0.6), 0 0 40px rgba(139,0,0,0.3); }
+.glow-gold    { box-shadow: 0 0 20px rgba(212,169,53,0.5), 0 0 40px rgba(212,169,53,0.2); }
+.glow-silver  { box-shadow: 0 0 15px rgba(168,184,200,0.4); }
+.text-glow    { text-shadow: 0 0 20px rgba(201,169,110,0.8); }
+
+/* Rune border */
+.rune-border {
+  border: 1px solid var(--parchment);
+  border-image: linear-gradient(
+    135deg, var(--crimson), var(--parchment), var(--crimson)
+  ) 1;
+}
+
+/* Stone input */
+.stone-input {
+  background: rgba(10,10,15,0.8);
+  border: 1px solid var(--silver-dim);
+  border-bottom: 2px solid var(--crimson);
+  color: var(--parchment-light);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  padding: 0.75rem 1rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  outline: none;
+  width: 100%;
+}
+
+.stone-input:focus {
+  border-color: var(--parchment);
+  box-shadow: 0 0 15px rgba(201,169,110,0.2);
+}
+
+.stone-input::placeholder {
+  color: var(--silver-dim);
+  font-style: italic;
+}
+
+/* Wax seal button */
+.seal-button {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: radial-gradient(ellipse at center, #6b0000, #3d0000);
+  color: var(--parchment);
+  border: 2px solid var(--crimson);
+  padding: 0.85rem 2.5rem;
+  cursor: pointer;
+  position: relative;
+  clip-path: polygon(12px 0%, calc(100% - 12px) 0%, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0% calc(100% - 12px), 0% 12px);
+  transition: all 0.3s;
+}
+
+.seal-button:hover {
+  background: radial-gradient(ellipse at center, #8b0000, #5a0000);
+  box-shadow: 0 0 30px rgba(139,0,0,0.7), 0 0 60px rgba(139,0,0,0.3);
+  transform: translateY(-2px);
+}
+
+.seal-button:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* Card component base */
+.card-base {
+  background: linear-gradient(145deg, #1a1a24, #0f0f18);
+  border: 1px solid var(--silver-dim);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-base:hover {
+  transform: translateY(-4px) scale(1.02);
+  border-color: var(--parchment);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 20px rgba(201,169,110,0.15);
+}
+
+/* Rarity borders */
+.rarity-common    { border-color: #607080; }
+.rarity-rare      { border-color: #4a7fad; }
+.rarity-epic      { border-color: #7b4fa8; }
+.rarity-legendary { border-color: var(--gold); box-shadow: 0 0 15px rgba(212,169,53,0.3); }
+
+/* Mana crystal */
+.mana-crystal {
+  width: 24px; height: 24px;
+  background: radial-gradient(circle at 35% 35%, #6ab3ff, #1a4a8a, #0a1f40);
+  border-radius: 50%;
+  border: 1px solid #4a8fd4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  color: white;
+  box-shadow: 0 0 8px rgba(106,179,255,0.4);
+}
+
+/* HP orb */
+.hp-orb {
+  width: 56px; height: 56px;
+  background: radial-gradient(circle at 35% 35%, #ff4444, #8b0000, #3d0000);
+  border-radius: 50%;
+  border: 2px solid var(--crimson-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: white;
+  box-shadow: 0 0 15px rgba(139,0,0,0.5);
+}
+
+/* Fog animation */
+@keyframes fogDrift {
+  0%   { transform: translateX(-10%) translateY(0); opacity: 0.4; }
+  50%  { transform: translateX(5%) translateY(-20px); opacity: 0.6; }
+  100% { transform: translateX(-10%) translateY(0); opacity: 0.4; }
+}
+
+@keyframes emberFloat {
+  0%   { transform: translateY(0) translateX(0); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 0.8; }
+  100% { transform: translateY(-200px) translateX(40px); opacity: 0; }
+}
+
+@keyframes candleFlicker {
+  0%, 100% { opacity: 1; transform: scaleY(1); }
+  25%       { opacity: 0.85; transform: scaleY(0.95) scaleX(1.05); }
+  50%       { opacity: 0.95; transform: scaleY(1.05) scaleX(0.97); }
+  75%       { opacity: 0.9; transform: scaleY(0.98); }
+}
+
+@keyframes runeGlow {
+  0%, 100% { text-shadow: 0 0 10px var(--crimson), 0 0 20px var(--crimson); }
+  50%       { text-shadow: 0 0 20px var(--crimson-bright), 0 0 40px var(--crimson-bright), 0 0 60px rgba(196,30,30,0.3); }
+}
+
+@keyframes cardFlip {
+  0%   { transform: rotateY(0deg); }
+  100% { transform: rotateY(180deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(139,0,0,0.4); }
+  50%       { box-shadow: 0 0 40px rgba(139,0,0,0.8), 0 0 60px rgba(139,0,0,0.3); }
+}
+
+.animate-fog       { animation: fogDrift 12s ease-in-out infinite; }
+.animate-ember     { animation: emberFloat 3s ease-in forwards; }
+.animate-flicker   { animation: candleFlicker 2s ease-in-out infinite; }
+.animate-rune      { animation: runeGlow 3s ease-in-out infinite; }
+.animate-float     { animation: float 4s ease-in-out infinite; }
+.animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
