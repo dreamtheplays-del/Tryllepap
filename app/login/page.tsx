@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import { signInWithGoogle } from '@/lib/supabase'
 
 export default function LoginPage() {
   const [mode, setMode] = useState<'signin' | 'register'>('signin')
@@ -23,10 +24,9 @@ export default function LoginPage() {
   const handleSubmit = async () => {
     setLoading(true)
     setError('')
-    // Supabase auth calls go here
     setTimeout(() => {
       setLoading(false)
-      setError('Connect Supabase to enable authentication.')
+      setError('Connect Supabase to enable email authentication.')
     }, 1200)
   }
 
@@ -41,30 +41,19 @@ export default function LoginPage() {
       position: 'relative',
       overflow: 'hidden',
     }}>
-      {/* Background atmosphere */}
       <div style={{
         position: 'absolute', inset: 0,
         background: 'radial-gradient(ellipse at 50% 50%, rgba(139,0,0,0.1) 0%, transparent 70%)',
         pointerEvents: 'none',
       }} />
 
-      <div style={{
-        width: '100%', maxWidth: '440px',
-        padding: '2rem',
-        position: 'relative', zIndex: 1,
-      }}>
-        {/* Runic header */}
+      <div style={{ width: '100%', maxWidth: '440px', padding: '2rem', position: 'relative', zIndex: 1 }}>
+        {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div className="animate-rune" style={{
-            fontSize: '2rem', marginBottom: '0.5rem',
-            color: 'var(--crimson)',
-          }}>ᚦ</div>
+          <div className="animate-rune" style={{ fontSize: '2rem', marginBottom: '0.5rem', color: 'var(--crimson)' }}>ᚦ</div>
           <h1 style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '1.2rem',
-            color: 'var(--parchment)',
-            letterSpacing: '0.15em',
-            marginBottom: '0.25rem',
+            fontFamily: 'var(--font-display)', fontSize: '1.2rem',
+            color: 'var(--parchment)', letterSpacing: '0.15em', marginBottom: '0.25rem',
           }}>
             {mode === 'signin' ? 'RETURN TO THE REALM' : 'FORGE YOUR LEGEND'}
           </h1>
@@ -74,29 +63,31 @@ export default function LoginPage() {
         </div>
 
         {/* Card */}
-        <div
-          style={{
-            background: 'linear-gradient(145deg, #1a1a28, #0f0f1a)',
-            border: '1px solid rgba(139,0,0,0.5)',
-            borderRadius: '4px',
-            padding: '2.5rem',
-            boxShadow: '0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(201,169,110,0.1)',
-            transition: 'transform 0.3s, opacity 0.3s',
-            transform: flipping ? 'rotateY(90deg)' : 'rotateY(0deg)',
-            opacity: flipping ? 0 : 1,
-          }}
-        >
+        <div style={{
+          background: 'linear-gradient(145deg, #1a1a28, #0f0f1a)',
+          border: '1px solid rgba(139,0,0,0.5)',
+          borderRadius: '4px',
+          padding: '2.5rem',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(201,169,110,0.1)',
+          transition: 'transform 0.3s, opacity 0.3s',
+          transform: flipping ? 'rotateY(90deg)' : 'rotateY(0deg)',
+          opacity: flipping ? 0 : 1,
+          position: 'relative',
+        }}>
           {/* Corner runes */}
-          {['top:8px;left:12px', 'top:8px;right:12px', 'bottom:8px;left:12px', 'bottom:8px;right:12px'].map((pos, i) => (
+          {['ᚱ', 'ᚦ', 'ᛏ', 'ᚾ'].map((glyph, i) => (
             <div key={i} style={{
               position: 'absolute',
-              ...Object.fromEntries(pos.split(';').map(p => p.split(':'))),
+              top: i < 2 ? '8px' : undefined,
+              bottom: i >= 2 ? '8px' : undefined,
+              left: i % 2 === 0 ? '12px' : undefined,
+              right: i % 2 === 1 ? '12px' : undefined,
               fontFamily: 'var(--font-display)',
               fontSize: '0.7rem',
               color: 'rgba(139,0,0,0.4)',
               userSelect: 'none',
             }}>
-              {['ᚱ', 'ᚦ', 'ᛏ', 'ᚾ'][i]}
+              {glyph}
             </div>
           ))}
 
@@ -189,33 +180,28 @@ export default function LoginPage() {
             <div style={{ flex: 1, height: '1px', background: 'rgba(168,184,200,0.2)' }} />
           </div>
 
-          {/* OAuth */}
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
-            import { signInWithGoogle } from '@/lib/supabase'
-
-// Replace the two OAuth buttons with just Google for now:
-<div style={{ display: 'flex', gap: '0.75rem' }}>
-  <button
-    onClick={() => signInWithGoogle()}
-    style={{
-      flex: 1,
-      background: 'rgba(255,255,255,0.04)',
-      border: '1px solid rgba(168,184,200,0.2)',
-      borderRadius: '2px',
-      padding: '0.6rem',
-      color: 'var(--silver)',
-      fontFamily: 'var(--font-display)',
-      fontSize: '0.65rem',
-      letterSpacing: '0.08em',
-      cursor: 'pointer',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-      transition: 'all 0.2s',
-    }}
-  >
-    <span style={{ fontWeight: 'bold', color: '#4285f4' }}>G</span>
-    Continue with Google
-  </button>
-</div>
+          {/* Google button */}
+          <button
+            onClick={() => signInWithGoogle()}
+            style={{
+              width: '100%',
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(168,184,200,0.2)',
+              borderRadius: '2px',
+              padding: '0.75rem',
+              color: 'var(--silver)',
+              fontFamily: 'var(--font-display)',
+              fontSize: '0.65rem',
+              letterSpacing: '0.08em',
+              cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem',
+              transition: 'all 0.2s',
+            }}
+          >
+            <span style={{ fontWeight: 'bold', color: '#4285f4', fontSize: '1rem' }}>G</span>
+            Continue with Google
+          </button>
+        </div>
 
         {/* Switch mode */}
         <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
