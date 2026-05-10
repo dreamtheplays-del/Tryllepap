@@ -182,7 +182,7 @@ export default function LoginPage() {
               disabled={loading}
               style={{ width: '100%', marginTop: '0.5rem', opacity: loading ? 0.7 : 1 }}
             >
-              {loading ? '⟳ Consulting the oracle...' : mode === 'signin' ? 'Enter the Realm' : 'Forge Your Legend'}
+              {loading ? '⟳ Consulting the oracle...' : mode === 'signin' ? 'Log In' : 'Forge Your Legend'}
             </button>
           </div>
 
