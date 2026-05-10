@@ -8,8 +8,8 @@ function ConfirmHandler() {
 
   useEffect(() => {
     const handleAuth = async () => {
-      // Wait a moment for Supabase to parse the hash and set the session
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // Give Supabase time to parse the hash and set the session
+      await new Promise(resolve => setTimeout(resolve, 1500))
 
       const { data: { user } } = await supabase.auth.getUser()
 
