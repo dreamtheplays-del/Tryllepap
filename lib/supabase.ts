@@ -1,17 +1,6 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@/utils/supabase/client'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables')
-}
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    flowType: 'pkce',
-  },
-})
+export const supabase = createClient()
 
 export type Card = {
   id: string
@@ -46,7 +35,6 @@ export type Profile = {
   created_at: string
 }
 
-// Fetch the current user's profile including is_admin
 export async function getCurrentProfile(): Promise<Profile | null> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
@@ -61,7 +49,6 @@ export async function getCurrentProfile(): Promise<Profile | null> {
   return data
 }
 
-// Sign in with Google
 export async function signInWithGoogle() {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
@@ -72,7 +59,6 @@ export async function signInWithGoogle() {
   if (error) throw error
 }
 
-// Sign out
 export async function signOut() {
   await supabase.auth.signOut()
 }
