@@ -8,12 +8,16 @@ export async function GET(request: NextRequest) {
   if (code) {
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        auth: {
+          flowType: 'pkce',
+        },
+      }
     )
 
     const { data: { user } } = await supabase.auth.exchangeCodeForSession(code)
 
-    // Auto-create profile if it doesn't exist yet (first Google login)
     if (user) {
       const { data: existing } = await supabase
         .from('profiles')
