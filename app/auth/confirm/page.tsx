@@ -1,9 +1,9 @@
 'use client'
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
-export default function ConfirmPage() {
+function ConfirmHandler() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -19,7 +19,6 @@ export default function ConfirmPage() {
         return
       }
 
-      // Check if profile exists
       const { data: existing } = await supabase
         .from('profiles')
         .select('id, username')
@@ -27,7 +26,6 @@ export default function ConfirmPage() {
         .single()
 
       if (!existing) {
-        // Create blank profile for new user
         await supabase.from('profiles').insert({
           id: user.id,
           username: '',
@@ -71,5 +69,13 @@ export default function ConfirmPage() {
         </p>
       </div>
     </div>
+  )
+}
+
+export default function ConfirmPage() {
+  return (
+    <Suspense>
+      <ConfirmHandler />
+    </Suspense>
   )
 }
