@@ -10,11 +10,12 @@ function ConfirmHandler() {
   useEffect(() => {
     const handleAuth = async () => {
       const code = searchParams.get('code')
-      if (!code) { router.push('/'); return }
+      if (!code) { router.push('/login'); return }
 
       const { data: { user }, error } = await supabase.auth.exchangeCodeForSession(code)
 
       if (error || !user) {
+        console.error('Auth error:', error)
         router.push('/login')
         return
       }
