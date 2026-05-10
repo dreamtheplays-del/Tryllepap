@@ -1,21 +1,19 @@
 'use client'
 import { Suspense, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
 function ConfirmHandler() {
   const router = useRouter()
-  const searchParams = useSearchParams()
 
   useEffect(() => {
     const handleAuth = async () => {
-      const code = searchParams.get('code')
-      if (!code) { router.push('/login'); return }
+      // Wait a moment for Supabase to parse the hash and set the session
+      await new Promise(resolve => setTimeout(resolve, 1000))
 
-      const { data: { user }, error } = await supabase.auth.exchangeCodeForSession(code)
+      const { data: { user } } = await supabase.auth.getUser()
 
-      if (error || !user) {
-        console.error('Auth error:', error)
+      if (!user) {
         router.push('/login')
         return
       }
@@ -48,7 +46,7 @@ function ConfirmHandler() {
     }
 
     handleAuth()
-  }, [router, searchParams])
+  }, [router])
 
   return (
     <div style={{
