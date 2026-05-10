@@ -26,7 +26,7 @@ export default function Navbar() {
         .from('profiles')
         .select('username')
         .eq('id', user.id)
-        .single()
+        .maybeSingle()
 
       setUsername(data?.username || null)
       setReady(true)
