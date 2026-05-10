@@ -27,3 +27,44 @@ export type Deck = {
   is_public: boolean
   created_at: string
 }
+
+export type Profile = {
+  id: string
+  username: string
+  avatar_url: string
+  wins: number
+  losses: number
+  is_admin: boolean
+  created_at: string
+}
+
+// Fetch the current user's profile including is_admin
+export async function getCurrentProfile(): Promise<Profile | null> {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single()
+
+  if (error) return null
+  return data
+}
+
+// Sign in with Google
+export async function signInWithGoogle() {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${window.location.origin}/auth/callback`,
+    },
+  })
+  if (error) throw error
+}
+
+// Sign out
+export async function signOut() {
+  await supabase.auth.signOut()
+}
