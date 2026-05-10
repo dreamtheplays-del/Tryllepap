@@ -1,75 +1,68 @@
 'use client'
-import { Suspense, useEffect } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
 function ConfirmHandler() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const [status, setStatus] = useState('OPENING THE GATE...')
 
   useEffect(() => {
-    const code = searchParams.get('code')
+    const run = async () => {
+      const code = searchParams.get('code')
 
-    if (code) {
-      // PKCE flow - exchange code for session
-      supabase.auth.exchangeCodeForSession(code).then(async ({ data: { user }, error }) => {
-        if (error || !user) { router.push('/login'); return }
-        await handleUser(user.id, user.user_metadata?.avatar_url || '')
-      })
-      return
+      if (!code) {
+        setStatus('No login code found.')
+        setTimeout(() => router.push('/login'), 2000)
+        return
+      }
+
+      setStatus('VERIFYING YOUR IDENTITY...')
+
+      const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+
+      if (error || !data.user) {
+        console.error('Session exchange failed:', error)
+        setStatus('Login failed. Returning...')
+        setTimeout(() => router.push('/login'), 2000)
+        return
+      }
+
+      const user = data.user
+      setStatus('CHECKING YOUR PROFILE...')
+
+      const { data: existing } = await supabase
+        .from('profiles')
+        .select('id, username')
+        .eq('id', user.id)
+        .single()
+
+      if (!existing) {
+        setStatus('CREATING YOUR PROFILE...')
+        await supabase.from('profiles').insert({
+          id: user.id,
+          username: '',
+          avatar_url: user.user_metadata?.avatar_url || '',
+          wins: 0,
+          losses: 0,
+          is_admin: false,
+        })
+        router.push('/choose-username')
+        return
+      }
+
+      if (!existing.username) {
+        router.push('/choose-username')
+        return
+      }
+
+      setStatus('WELCOME BACK!')
+      router.push('/')
     }
 
-    // Implicit flow - listen for the session to be set from the URL hash
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        subscription.unsubscribe()
-        await handleUser(session.user.id, session.user.user_metadata?.avatar_url || '')
-      }
-      if (event === 'SIGNED_OUT') {
-        router.push('/login')
-      }
-    })
-
-    // Fallback timeout in case event already fired
-    const timeout = setTimeout(async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { router.push('/login'); return }
-      await handleUser(user.id, user.user_metadata?.avatar_url || '')
-    }, 3000)
-
-    return () => {
-      subscription.unsubscribe()
-      clearTimeout(timeout)
-    }
+    run()
   }, [router, searchParams])
-
-  async function handleUser(userId: string, avatarUrl: string) {
-    const { data: existing } = await supabase
-      .from('profiles')
-      .select('id, username')
-      .eq('id', userId)
-      .single()
-
-    if (!existing) {
-      await supabase.from('profiles').insert({
-        id: userId,
-        username: '',
-        avatar_url: avatarUrl,
-        wins: 0,
-        losses: 0,
-        is_admin: false,
-      })
-      router.push('/choose-username')
-      return
-    }
-
-    if (!existing.username) {
-      router.push('/choose-username')
-      return
-    }
-
-    router.push('/')
-  }
 
   return (
     <div style={{
@@ -87,7 +80,7 @@ function ConfirmHandler() {
           letterSpacing: '0.15em',
           fontSize: '0.8rem',
         }}>
-          OPENING THE GATE...
+          {status}
         </p>
       </div>
     </div>
