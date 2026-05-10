@@ -15,11 +15,12 @@ export default function Navbar() {
   const path = usePathname()
   const router = useRouter()
   const [username, setUsername] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const loadUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      if (!user) { setLoading(false); return }
 
       const { data } = await supabase
         .from('profiles')
@@ -27,7 +28,8 @@ export default function Navbar() {
         .eq('id', user.id)
         .single()
 
-      if (data?.username) setUsername(data.username)
+      setUsername(data?.username || null)
+      setLoading(false)
     }
 
     loadUser()
@@ -43,6 +45,7 @@ export default function Navbar() {
     await signOut()
     setUsername(null)
     router.push('/')
+    router.refresh()
   }
 
   return (
@@ -54,7 +57,6 @@ export default function Navbar() {
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       padding: '0 2rem', height: '64px',
     }}>
-      {/* Logo */}
       <Link href="/" style={{ textDecoration: 'none' }}>
         <span style={{
           fontFamily: 'var(--font-display)',
@@ -67,7 +69,6 @@ export default function Navbar() {
         </span>
       </Link>
 
-      {/* Nav links */}
       <div style={{ display: 'flex', gap: '0.25rem' }}>
         {NAV_ITEMS.map(({ href, label, icon }) => {
           const active = path.startsWith(href)
@@ -92,32 +93,35 @@ export default function Navbar() {
         })}
       </div>
 
-      {/* Auth area */}
-      {username ? (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '0.7rem',
-            letterSpacing: '0.08em',
-            color: 'var(--parchment)',
-          }}>
-            ᚱ {username}
-          </span>
-          <button
-            className="seal-button"
-            onClick={handleLogout}
-            style={{ padding: '0.5rem 1.5rem', fontSize: '0.7rem' }}
-          >
-            Depart
-          </button>
-        </div>
-      ) : (
-        <Link href="/login" style={{ textDecoration: 'none' }}>
-          <button className="seal-button" style={{ padding: '0.5rem 1.5rem', fontSize: '0.7rem' }}>
-            Enter
-          </button>
-        </Link>
-      )}
+      <div style={{ minWidth: '120px', display: 'flex', justifyContent: 'flex-end' }}>
+        {!loading && (
+          username ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <span style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: '0.7rem',
+                letterSpacing: '0.08em',
+                color: 'var(--parchment)',
+              }}>
+                ᚱ {username}
+              </span>
+              <button
+                className="seal-button"
+                onClick={handleLogout}
+                style={{ padding: '0.5rem 1.5rem', fontSize: '0.7rem' }}
+              >
+                Depart
+              </button>
+            </div>
+          ) : (
+            <Link href="/login" style={{ textDecoration: 'none' }}>
+              <button className="seal-button" style={{ padding: '0.5rem 1.5rem', fontSize: '0.7rem' }}>
+                Enter
+              </button>
+            </Link>
+          )
+        )}
+      </div>
     </nav>
   )
 }
