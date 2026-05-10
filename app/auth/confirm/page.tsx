@@ -1,35 +1,27 @@
 'use client'
 import { Suspense, useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
 function ConfirmHandler() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [status, setStatus] = useState('OPENING THE GATE...')
 
   useEffect(() => {
     const run = async () => {
-      const code = searchParams.get('code')
-
-      if (!code) {
-        setStatus('No login code found.')
-        setTimeout(() => router.push('/login'), 2000)
-        return
-      }
-
       setStatus('VERIFYING YOUR IDENTITY...')
 
-      const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+      // Session is already exchanged server-side in /auth/callback/route.ts
+      // We just need to read the current user from the session cookie
+      const { data: { user }, error } = await supabase.auth.getUser()
 
-      if (error || !data.user) {
-        console.error('Session exchange failed:', error)
+      if (error || !user) {
+        console.error('No active session:', error)
         setStatus('Login failed. Returning...')
         setTimeout(() => router.push('/login'), 2000)
         return
       }
 
-      const user = data.user
       setStatus('CHECKING YOUR PROFILE...')
 
       // maybeSingle() returns null instead of 406 when no row found
@@ -63,7 +55,7 @@ function ConfirmHandler() {
     }
 
     run()
-  }, [router, searchParams])
+  }, [router])
 
   return (
     <div style={{
