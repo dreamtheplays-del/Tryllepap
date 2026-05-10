@@ -1,0 +1,88 @@
+import { Card } from './supabase'
+
+export const MOCK_CARDS: Card[] = [
+  {
+    id: '1', name: 'Void Wraith', type: 'creature', rarity: 'rare',
+    mana_cost: 4, attack: 5, defense: 3,
+    description: 'When this creature enters the field, deal 2 damage to all enemies.',
+    lore: 'Born from the screams of a dying star, the Void Wraith haunts the spaces between worlds.',
+    image_url: '', created_at: '',
+  },
+  {
+    id: '2', name: 'Crimson Bolt', type: 'spell', rarity: 'common',
+    mana_cost: 2, attack: null, defense: null,
+    description: 'Deal 4 damage to target creature or player.',
+    lore: 'The mages of the Ashen Order perfected this spell through centuries of suffering.',
+    image_url: '', created_at: '',
+  },
+  {
+    id: '3', name: 'Soul Anchor', type: 'artifact', rarity: 'legendary',
+    mana_cost: 6, attack: null, defense: null,
+    description: 'Once per turn, when a creature you control dies, return it to your hand.',
+    lore: 'Forged in the First Age, before death had learned to be permanent.',
+    image_url: '', created_at: '',
+  },
+  {
+    id: '4', name: 'Bone Colossus', type: 'creature', rarity: 'epic',
+    mana_cost: 8, attack: 9, defense: 8,
+    description: 'Gains +1/+1 for each creature in any graveyard.',
+    lore: 'It remembers every warrior it has devoured. It wears their names like armour.',
+    image_url: '', created_at: '',
+  },
+  {
+    id: '5', name: 'Shadow Step', type: 'spell', rarity: 'rare',
+    mana_cost: 3, attack: null, defense: null,
+    description: 'Target creature gains Stealth until end of turn and may attack immediately.',
+    lore: 'To move like darkness is to be everywhere and nowhere at once.',
+    image_url: '', created_at: '',
+  },
+  {
+    id: '6', name: 'Iron Sentinel', type: 'creature', rarity: 'common',
+    mana_cost: 3, attack: 2, defense: 6,
+    description: 'Taunt. Adjacent creatures take half damage.',
+    lore: 'It has stood watch for four hundred years. It does not tire. It does not blink.',
+    image_url: '', created_at: '',
+  },
+  {
+    id: '7', name: 'Cursed Tome', type: 'artifact', rarity: 'epic',
+    mana_cost: 5, attack: null, defense: null,
+    description: 'At the start of each turn, draw 2 cards and discard 1.',
+    lore: 'Knowledge has a price. This book collects it.',
+    image_url: '', created_at: '',
+  },
+  {
+    id: '8', name: 'Plague Wind', type: 'spell', rarity: 'legendary',
+    mana_cost: 9, attack: null, defense: null,
+    description: 'Destroy all enemy creatures. Their owner draws 1 card for each.',
+    lore: 'It came from the east and did not stop for three kingdoms.',
+    image_url: '', created_at: '',
+  },
+  {
+    id: '9', name: 'Ember Sprite', type: 'creature', rarity: 'common',
+    mana_cost: 1, attack: 2, defense: 1,
+    description: 'When this dies, deal 1 damage to any target.',
+    lore: 'Small. Furious. Temporary.',
+    image_url: '', created_at: '',
+  },
+  {
+    id: '10', name: 'Glacial Ward', type: 'artifact', rarity: 'rare',
+    mana_cost: 4, attack: null, defense: null,
+    description: 'Your hero takes 2 less damage from all sources.',
+    lore: 'Carved from glacier ice that never melts, from a mountain that no longer exists.',
+    image_url: '', created_at: '',
+  },
+  {
+    id: '11', name: 'Rot Shambler', type: 'creature', rarity: 'common',
+    mana_cost: 2, attack: 3, defense: 2,
+    description: 'Poisonous: creatures damaged by this get -1 Attack permanently.',
+    lore: 'The swamp remembers those who disrespect it.',
+    image_url: '', created_at: '',
+  },
+  {
+    id: '12', name: 'Death Knell', type: 'spell', rarity: 'epic',
+    mana_cost: 7, attack: null, defense: null,
+    description: 'Target creature dies. You gain life equal to its Attack.',
+    lore: 'Every ending is a beginning, if you know how to drink from it.',
+    image_url: '', created_at: '',
+  },
+]
