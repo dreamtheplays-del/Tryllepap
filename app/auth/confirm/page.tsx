@@ -1,52 +1,75 @@
 'use client'
 import { Suspense, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
 function ConfirmHandler() {
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   useEffect(() => {
-    const handleAuth = async () => {
-      // Give Supabase time to parse the hash and set the session
-      await new Promise(resolve => setTimeout(resolve, 1500))
+    const code = searchParams.get('code')
 
-      const { data: { user } } = await supabase.auth.getUser()
-
-      if (!user) {
-        router.push('/login')
-        return
-      }
-
-      const { data: existing } = await supabase
-        .from('profiles')
-        .select('id, username')
-        .eq('id', user.id)
-        .single()
-
-      if (!existing) {
-        await supabase.from('profiles').insert({
-          id: user.id,
-          username: '',
-          avatar_url: user.user_metadata?.avatar_url || '',
-          wins: 0,
-          losses: 0,
-          is_admin: false,
-        })
-        router.push('/choose-username')
-        return
-      }
-
-      if (!existing.username) {
-        router.push('/choose-username')
-        return
-      }
-
-      router.push('/')
+    if (code) {
+      // PKCE flow - exchange code for session
+      supabase.auth.exchangeCodeForSession(code).then(async ({ data: { user }, error }) => {
+        if (error || !user) { router.push('/login'); return }
+        await handleUser(user.id, user.user_metadata?.avatar_url || '')
+      })
+      return
     }
 
-    handleAuth()
-  }, [router])
+    // Implicit flow - listen for the session to be set from the URL hash
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        subscription.unsubscribe()
+        await handleUser(session.user.id, session.user.user_metadata?.avatar_url || '')
+      }
+      if (event === 'SIGNED_OUT') {
+        router.push('/login')
+      }
+    })
+
+    // Fallback timeout in case event already fired
+    const timeout = setTimeout(async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { router.push('/login'); return }
+      await handleUser(user.id, user.user_metadata?.avatar_url || '')
+    }, 3000)
+
+    return () => {
+      subscription.unsubscribe()
+      clearTimeout(timeout)
+    }
+  }, [router, searchParams])
+
+  async function handleUser(userId: string, avatarUrl: string) {
+    const { data: existing } = await supabase
+      .from('profiles')
+      .select('id, username')
+      .eq('id', userId)
+      .single()
+
+    if (!existing) {
+      await supabase.from('profiles').insert({
+        id: userId,
+        username: '',
+        avatar_url: avatarUrl,
+        wins: 0,
+        losses: 0,
+        is_admin: false,
+      })
+      router.push('/choose-username')
+      return
+    }
+
+    if (!existing.username) {
+      router.push('/choose-username')
+      return
+    }
+
+    router.push('/')
+  }
 
   return (
     <div style={{
