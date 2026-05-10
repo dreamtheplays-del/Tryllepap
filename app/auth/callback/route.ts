@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
-  // With implicit flow, tokens are in the URL hash (#access_token=...)
-  // The hash is not sent to the server, so redirect to client page to handle it
-  return NextResponse.redirect(new URL('/auth/confirm', request.url.split('?')[0]))
+  const requestUrl = new URL(request.url)
+  const code = requestUrl.searchParams.get('code')
+
+  if (code) {
+    return NextResponse.redirect(
+      new URL(`/auth/confirm?code=${code}`, requestUrl.origin)
+    )
+  }
+
+  // No code = implicit flow, tokens are in hash — redirect to confirm to handle
+  return NextResponse.redirect(new URL('/auth/confirm', requestUrl.origin))
 }
