@@ -1,6 +1,5 @@
 'use client'
 import { useState } from 'react'
-import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 
 export default function LoginPage() {
@@ -27,7 +26,7 @@ export default function LoginPage() {
     setError('')
     setTimeout(() => {
       setLoading(false)
-      setError('Connect Supabase to enable email authentication.')
+      setError('Email authentication not yet enabled.')
     }, 1200)
   }
 
@@ -39,17 +38,12 @@ export default function LoginPage() {
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
         },
       })
       if (error) {
         setError(`Google sign-in failed: ${error.message}`)
         setGoogleLoading(false)
       }
-      // If no error, browser will redirect to Google — no need to do anything
     } catch (e: unknown) {
       setError(`Unexpected error: ${e instanceof Error ? e.message : 'unknown'}`)
       setGoogleLoading(false)
