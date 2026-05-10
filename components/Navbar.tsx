@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { supabase, signOut } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 
 const NAV_ITEMS = [
   { href: '/cards',   label: 'Codex',   icon: '📖' },
@@ -15,12 +15,12 @@ export default function Navbar() {
   const path = usePathname()
   const router = useRouter()
   const [username, setUsername] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [ready, setReady] = useState(false)
 
   useEffect(() => {
     const loadUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { setLoading(false); return }
+      if (!user) { setReady(true); return }
 
       const { data } = await supabase
         .from('profiles')
@@ -29,7 +29,7 @@ export default function Navbar() {
         .single()
 
       setUsername(data?.username || null)
-      setLoading(false)
+      setReady(true)
     }
 
     loadUser()
@@ -42,7 +42,7 @@ export default function Navbar() {
   }, [])
 
   const handleLogout = async () => {
-    await signOut()
+    await supabase.auth.signOut()
     setUsername(null)
     router.push('/')
     router.refresh()
@@ -93,8 +93,8 @@ export default function Navbar() {
         })}
       </div>
 
-      <div style={{ minWidth: '120px', display: 'flex', justifyContent: 'flex-end' }}>
-        {!loading && (
+      <div style={{ minWidth: '160px', display: 'flex', justifyContent: 'flex-end' }}>
+        {ready && (
           username ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <span style={{
