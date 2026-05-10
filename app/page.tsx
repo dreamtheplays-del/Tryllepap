@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { supabase } from '@/lib/supabase'
 
 function EmberParticles() {
   const [embers, setEmbers] = useState<{ id: number; left: string; delay: string; size: string }[]>([])
@@ -84,6 +85,22 @@ const FEATURE_PANELS = [
 
 export default function LandingPage() {
   const [hoveredPanel, setHoveredPanel] = useState<number | null>(null)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setIsLoggedIn(!!user)
+    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setIsLoggedIn(!!session)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    setIsLoggedIn(false)
+  }
 
   return (
     <div style={{
@@ -156,11 +173,21 @@ export default function LandingPage() {
           Challenge all who dare oppose you.
         </p>
 
-        <Link href="/login" style={{ textDecoration: 'none' }}>
-          <button className="seal-button animate-pulse-glow" style={{ fontSize: '0.9rem', padding: '1rem 3rem' }}>
-            Begin Your Journey
+        {isLoggedIn ? (
+          <button
+            className="seal-button"
+            style={{ fontSize: '0.9rem', padding: '1rem 3rem' }}
+            onClick={handleLogout}
+          >
+            Log Out
           </button>
-        </Link>
+        ) : (
+          <Link href="/login" style={{ textDecoration: 'none' }}>
+            <button className="seal-button animate-pulse-glow" style={{ fontSize: '0.9rem', padding: '1rem 3rem' }}>
+              Log In
+            </button>
+          </Link>
+        )}
 
         {/* Decorative divider */}
         <div style={{
