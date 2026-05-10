@@ -110,13 +110,13 @@ export default function Navbar() {
                 onClick={handleLogout}
                 style={{ padding: '0.5rem 1.5rem', fontSize: '0.7rem' }}
               >
-                Depart
+                Log Out
               </button>
             </div>
           ) : (
             <Link href="/login" style={{ textDecoration: 'none' }}>
               <button className="seal-button" style={{ padding: '0.5rem 1.5rem', fontSize: '0.7rem' }}>
-                Enter
+                Log In
               </button>
             </Link>
           )
