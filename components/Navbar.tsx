@@ -1,7 +1,8 @@
 'use client'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { supabase, signOut } from '@/lib/supabase'
 
 const NAV_ITEMS = [
   { href: '/cards',   label: 'Codex',   icon: '📖' },
@@ -12,7 +13,37 @@ const NAV_ITEMS = [
 
 export default function Navbar() {
   const path = usePathname()
-  const [open, setOpen] = useState(false)
+  const router = useRouter()
+  const [username, setUsername] = useState<string | null>(null)
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const { data } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', user.id)
+        .single()
+
+      if (data?.username) setUsername(data.username)
+    }
+
+    loadUser()
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      loadUser()
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const handleLogout = async () => {
+    await signOut()
+    setUsername(null)
+    router.push('/')
+  }
 
   return (
     <nav style={{
@@ -62,11 +93,31 @@ export default function Navbar() {
       </div>
 
       {/* Auth area */}
-      <Link href="/login" style={{ textDecoration: 'none' }}>
-        <button className="seal-button" style={{ padding: '0.5rem 1.5rem', fontSize: '0.7rem' }}>
-          Enter
-        </button>
-      </Link>
+      {username ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <span style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '0.7rem',
+            letterSpacing: '0.08em',
+            color: 'var(--parchment)',
+          }}>
+            ᚱ {username}
+          </span>
+          <button
+            className="seal-button"
+            onClick={handleLogout}
+            style={{ padding: '0.5rem 1.5rem', fontSize: '0.7rem' }}
+          >
+            Depart
+          </button>
+        </div>
+      ) : (
+        <Link href="/login" style={{ textDecoration: 'none' }}>
+          <button className="seal-button" style={{ padding: '0.5rem 1.5rem', fontSize: '0.7rem' }}>
+            Enter
+          </button>
+        </Link>
+      )}
     </nav>
   )
 }
