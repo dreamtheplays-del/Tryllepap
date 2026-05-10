@@ -191,27 +191,31 @@ export default function LoginPage() {
 
           {/* OAuth */}
           <div style={{ display: 'flex', gap: '0.75rem' }}>
-            {[{ icon: 'G', label: 'Google', color: '#4285f4' }, { icon: 'D', label: 'Discord', color: '#5865f2' }].map(p => (
-              <button key={p.label} style={{
-                flex: 1,
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(168,184,200,0.2)',
-                borderRadius: '2px',
-                padding: '0.6rem',
-                color: 'var(--silver)',
-                fontFamily: 'var(--font-display)',
-                fontSize: '0.65rem',
-                letterSpacing: '0.08em',
-                cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-                transition: 'all 0.2s',
-              }}>
-                <span style={{ fontWeight: 'bold', color: p.color }}>{p.icon}</span>
-                {p.label}
-              </button>
-            ))}
-          </div>
-        </div>
+            import { signInWithGoogle } from '@/lib/supabase'
+
+// Replace the two OAuth buttons with just Google for now:
+<div style={{ display: 'flex', gap: '0.75rem' }}>
+  <button
+    onClick={() => signInWithGoogle()}
+    style={{
+      flex: 1,
+      background: 'rgba(255,255,255,0.04)',
+      border: '1px solid rgba(168,184,200,0.2)',
+      borderRadius: '2px',
+      padding: '0.6rem',
+      color: 'var(--silver)',
+      fontFamily: 'var(--font-display)',
+      fontSize: '0.65rem',
+      letterSpacing: '0.08em',
+      cursor: 'pointer',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+      transition: 'all 0.2s',
+    }}
+  >
+    <span style={{ fontWeight: 'bold', color: '#4285f4' }}>G</span>
+    Continue with Google
+  </button>
+</div>
 
         {/* Switch mode */}
         <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
