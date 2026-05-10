@@ -1,6 +1,15 @@
-import { createClient } from '@/utils/supabase/client'
+import { createClient } from '@supabase/supabase-js'
 
-export const supabase = createClient()
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    flowType: 'pkce',
+    persistSession: true,
+    detectSessionInUrl: true,
+  },
+})
 
 export type Card = {
   id: string
