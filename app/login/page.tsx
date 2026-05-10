@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { signInWithGoogle } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 
 export default function LoginPage() {
   const [mode, setMode] = useState<'signin' | 'register'>('signin')
@@ -11,6 +11,7 @@ export default function LoginPage() {
   const [username, setUsername] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
 
   const switchMode = () => {
     setFlipping(true)
@@ -28,6 +29,31 @@ export default function LoginPage() {
       setLoading(false)
       setError('Connect Supabase to enable email authentication.')
     }, 1200)
+  }
+
+  const handleGoogle = async () => {
+    setGoogleLoading(true)
+    setError('')
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      })
+      if (error) {
+        setError(`Google sign-in failed: ${error.message}`)
+        setGoogleLoading(false)
+      }
+      // If no error, browser will redirect to Google — no need to do anything
+    } catch (e: unknown) {
+      setError(`Unexpected error: ${e instanceof Error ? e.message : 'unknown'}`)
+      setGoogleLoading(false)
+    }
   }
 
   return (
@@ -48,7 +74,6 @@ export default function LoginPage() {
       }} />
 
       <div style={{ width: '100%', maxWidth: '440px', padding: '2rem', position: 'relative', zIndex: 1 }}>
-        {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <div className="animate-rune" style={{ fontSize: '2rem', marginBottom: '0.5rem', color: 'var(--crimson)' }}>ᚦ</div>
           <h1 style={{
@@ -62,7 +87,6 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Card */}
         <div style={{
           background: 'linear-gradient(145deg, #1a1a28, #0f0f1a)',
           border: '1px solid rgba(139,0,0,0.5)',
@@ -74,7 +98,6 @@ export default function LoginPage() {
           opacity: flipping ? 0 : 1,
           position: 'relative',
         }}>
-          {/* Corner runes */}
           {['ᚱ', 'ᚦ', 'ᛏ', 'ᚾ'].map((glyph, i) => (
             <div key={i} style={{
               position: 'absolute',
@@ -169,7 +192,6 @@ export default function LoginPage() {
             </button>
           </div>
 
-          {/* Divider */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: '1rem',
             margin: '1.5rem 0',
@@ -180,9 +202,9 @@ export default function LoginPage() {
             <div style={{ flex: 1, height: '1px', background: 'rgba(168,184,200,0.2)' }} />
           </div>
 
-          {/* Google button */}
           <button
-            onClick={() => signInWithGoogle()}
+            onClick={handleGoogle}
+            disabled={googleLoading}
             style={{
               width: '100%',
               background: 'rgba(255,255,255,0.04)',
@@ -193,17 +215,17 @@ export default function LoginPage() {
               fontFamily: 'var(--font-display)',
               fontSize: '0.65rem',
               letterSpacing: '0.08em',
-              cursor: 'pointer',
+              cursor: googleLoading ? 'not-allowed' : 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem',
               transition: 'all 0.2s',
+              opacity: googleLoading ? 0.7 : 1,
             }}
           >
             <span style={{ fontWeight: 'bold', color: '#4285f4', fontSize: '1rem' }}>G</span>
-            Continue with Google
+            {googleLoading ? 'Opening the portal...' : 'Continue with Google'}
           </button>
         </div>
 
-        {/* Switch mode */}
         <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
           <span style={{ color: 'var(--silver-dim)', fontFamily: 'var(--font-body)', fontSize: '0.95rem' }}>
             {mode === 'signin' ? 'New to the realm? ' : 'Already a warrior? '}
